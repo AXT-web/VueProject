@@ -10,11 +10,12 @@
   "dependencies": {
     "axios": "^0.18.0",
     "element-ui": "^2.4.5",
+    "eslint-plugin-node": "^11.1.0",
     "vue": "^2.5.22",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.4.0",
+    "@vue/cli-plugin-babel": "^4.5.12",
     "@vue/cli-plugin-eslint": "^3.4.0",
     "@vue/cli-service": "^3.4.0",
     "@vue/eslint-config-standard": "^4.0.0",
