@@ -30,7 +30,10 @@ import {
   Option,
   Cascader,
   Alert,
-  Steps
+  Steps,
+  Upload,
+  Timeline,
+  TimelineItem
 } from 'element-ui'
 
 Vue.use(Button)
@@ -62,6 +65,9 @@ Vue.use(Option)
 Vue.use(Cascader)
 Vue.use(Alert)
 Vue.use(Steps)
+Vue.use(Upload)
+Vue.use(Timeline)
+Vue.use(TimelineItem)
 
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm

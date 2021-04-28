@@ -70,6 +70,7 @@
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
+
           <el-tab-pane label="商品属性" name="2">
             <!-- 循环生成静态属性 -->
             <el-form-item
@@ -80,13 +81,50 @@
               <el-input v-model="item.attr_vals"></el-input>
             </el-form-item>
           </el-tab-pane>
+
+          <el-tab-pane label="商品图片" name="3">
+            <!-- 商品图片上传
+            action:指定图片上传api接口
+            :on-preview ： 当点击图片时会触发该事件进行预览操作,处理图片预览
+            :on-remove : 当用户点击图片右上角的X号时触发执行
+            :on-success：当用户点击上传图片并成功上传时触发
+            list-type ：设置预览图片的方式
+            :headers ：设置上传图片的请求头 -->
+            <el-upload
+              :action="uploadURL"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :on-success="handleSuccess"
+              list-type="picture"
+              :headers="headerObj"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-tab-pane>
+
+          <!-- 富文本编辑器组件 -->
+          <el-tab-pane label="商品内容" name="4">
+            <!-- 富文本编辑器组件 -->
+            <quill-editor v-model="addForm.goods_introduce"></quill-editor>
+            <!-- 添加商品按钮 -->
+            <el-button type="primary" class="btnAdd" @click="add"
+              >添加商品</el-button
+            >
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+
+    <!-- 预览图片对话框 -->
+    <el-dialog title="图片预览" :visible.sync="previewVisible" width="50%">
+      <img :src="previewPath" class="previewImg" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
+//官方推荐将lodash导入为_
+import _ from 'lodash'
 export default {
   data() {
     return {
@@ -99,7 +137,19 @@ export default {
         goods_weight: 0,
         goods_number: 0,
         goods_cat: [],
+        //上传图片数组
+        pics: [],
+        //商品的详情介绍
+        goods_introduce: '',
       },
+      //上传图片的url地址
+      uploadURL: 'http://127.0.0.1:8888/api/private/v1/upload',
+      //图片上传组件的headers请求头对象
+      headerObj: { Authorization: window.sessionStorage.getItem('token') },
+      //保存预览图片的url地址
+      previewPath: '',
+      //控制预览图片对话框的显示和隐藏
+      previewVisible: false,
       //验证规则
       addFormRules: {
         goods_name: [
@@ -218,8 +268,65 @@ export default {
       return null
     },
   },
+  handlePreview(file) {
+    //当用户点击图片进行预览时执行，处理图片预览
+    //形参file就是用户预览的那个文件
+    this.previewPath = file.response.data.url
+    //显示预览图片对话框
+    this.previewVisible = true
+  },
+  handleRemove(file) {
+    //当用户点击X号删除时执行
+    //形参file就是用户点击删除的文件
+    //获取用户点击删除的那个图片的临时路径
+    const filePath = file.response.data.tmp_path
+    //使用findIndex来查找符合条件的索引
+    const index = this.addForm.pics.findIndex((item) => item.pic === filePath)
+    //移除索引对应的图片
+    this.addForm.pics.splice(index, 1)
+  },
+  handleSuccess(response) {
+    //当上传成功时触发执行
+    //形参response就是上传成功之后服务器返回的结果
+    //将服务器返回的临时路径保存到addForm表单的pics数组中
+    this.addForm.pics.push({ pic: response.data.tmp_path })
+  },
+  add() {
+    this.$refs.addFormRef.validate(async (valid) => {
+      if (!valid) return this.$message.error('请填写必要的表单项!')
+
+      //将addForm进行深拷贝，避免goods_cat数组转换字符串之后导致级联选择器报错
+      const form = _.cloneDeep(this.addForm)
+      //将goods_cat从数组转换为"1,2,3"字符串形式
+      form.goods_cat = form.goods_cat.join(',')
+      //处理attrs数组，数组中需要包含商品的动态参数和静态属性
+      //将manyTableData（动态参数）处理添加到attrs
+      this.manyTableData.forEach((item) => {
+        form.attrs.push({
+          attr_id: item.attr_id,
+          attr_value: item.attr_vals.join(' '),
+        })
+      })
+      //将onlyTableData（静态属性）处理添加到attrs
+      this.onlyTableData.forEach((item) => {
+        form.attrs.push({ attr_id: item.attr_id, attr_value: item.attr_vals })
+      })
+
+      //发送请求完成商品的添加,商品名称必须是唯一的
+      const { data: res } = await this.$http.post('goods', form)
+      if (res.meta.status !== 201) {
+        return this.$message.error('添加商品失败')
+      }
+      this.$message.success('添加商品成功')
+      //编程式导航跳转到商品列表
+      this.$router.push('/goods')
+    })
+  },
 }
 </script>
 
 <style lang="less" scoped>
+.btnAdd {
+  margin-top: 15px;
+}
 </style>

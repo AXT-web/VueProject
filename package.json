@@ -26,7 +26,9 @@
     "eslint-plugin-vue": "^5.0.0",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
+    "lodash": "^4.17.21",
     "vue-cli-plugin-element": "^1.0.1",
+    "vue-quill-editor": "^3.0.6",
     "vue-template-compiler": "^2.5.21"
   }
 }

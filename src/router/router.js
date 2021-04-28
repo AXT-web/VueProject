@@ -8,10 +8,11 @@ import Rights from '../components/power/Rights.vue'
 import Roles from '../components/power/Roles.vue'
 import Cate from '../components/goods/Cate.vue'
 import Params from '../components/goods/Params.vue'
-import GoodList from '../components/goods/List.vue'
+import GoodsList from '../components/goods/List.vue'
 // 在router.js中引入goods/Add.vue,并添加路由规则
-import GoodAdd from './components/goods/Add.vue'
-import { component } from 'vue/types/umd'
+import GoodAdd from '../components/goods/Add.vue'
+import Order from '../components/order/Order.vue'
+import Report from '../components/report/Report.vue'
 
 Vue.use(Router)
 
@@ -30,8 +31,10 @@ const router = new Router({
         { path: '/roles', component: Roles },
         { path: '/categories', component: Cate },
         { path: '/params', component: Params },
-        { path: '/goods', component: GoodList  },
-        { path: '/goods/add', component: GoodAdd}
+        { path: '/goods', component: GoodsList },
+        { path: '/goods/add', component: GoodAdd },
+        { path: '/order', component: Order },
+        { path: '/reports', component: Report }
       ]
     }
   ]
